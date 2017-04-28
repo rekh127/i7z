@@ -584,6 +584,7 @@ void Test_Or_Make_MSR_DEVICE_FILES()
         }
     }
 }
+#ifdef __linux__
 double cpufreq_info()
 {
     //CPUINFO is wrong for i7 but correct for the number of physical and logical cores present
@@ -601,6 +602,21 @@ double cpufreq_info()
     fclose (tmp_file);
     return atof(tmp_str);
 }
+#elif __FreeBSD__
+double cpufreq_info()
+{
+    struct clockinfo clock;
+    size_t len;
+
+    len = sizeof(clock);
+    if (sysctlbyname ("hw.clockrate", &clock, &len, NULL, 0) == -1)
+    {
+        perror ("cpufreq_info:sysctl");
+        exit (127);
+    }
+    return (clock.hz);
+}
+#endif
 
 int check_and_return_processor(char*strinfo)
 {
