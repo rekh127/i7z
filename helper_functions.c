@@ -743,6 +743,7 @@ void print_socket_information(struct cpu_socket_info* socket)
     printf("Socket-%d [num of cpus %d physical %d logical %d] %s\n",socket->socket_num,socket->max_cpu,socket->num_physical_cores,socket->num_logical_cores,socket_list);
 }
 
+#ifdef __linux__
 void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
 {
     FILE *fp = fopen("/proc/cpuinfo","r");
@@ -789,6 +790,51 @@ void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
     chi->max_online_cpu = it_processor_num+1;
     fclose(fp);
 }
+#elif __FreeBSD__
+void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
+{
+    int i;
+    FILE *fp = fopen("/var/run/dmesg.boot", "r");
+    char strinfo[200];
+    char *tmp;
+
+    int processor_num, physicalid_num = 0, coreid_num = 0;
+    int ncpu = 0, packages, cores, threads;
+
+    if (fp!=NULL) {
+        while ( fgets(strinfo,200,fp) != NULL) {
+            if (strstr(strinfo, "FreeBSD/SMP: ") != NULL) {
+                if ((tmp = strstr(strinfo, "Multiprocessor System Detected: ")) != NULL) {
+                    tmp = strchr(tmp, ':');
+                    tmp++; /* skip space */
+                    ncpu = atoi(tmp);
+                } else {
+                    tmp = strchr(strinfo, ' ');
+                    tmp++; /* skip space */
+                    packages = atoi(tmp);
+                    tmp = strchr(tmp, 'x');
+                    tmp++; /* skip space */
+                    cores = atoi(tmp);
+                    threads = ncpu / (packages * cores);
+                }
+            }
+        }
+        for (i = 0; i < ncpu; i++) {
+            processor_num = i;
+            if ((coreid_num + 1) == cores)
+                physicalid_num++;
+            physicalid_num %= packages;
+            coreid_num = processor_num % cores;
+
+            chi->processor_num[i] = processor_num;
+            chi->package_num[i] = physicalid_num;
+            chi->coreid_num[i] = coreid_num;
+        }
+    }
+    chi->max_online_cpu = ncpu;
+    fclose(fp);
+}
+#endif
 
 void print_CPU_Heirarchy(struct cpu_heirarchy_info chi)
 {
