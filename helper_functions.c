@@ -522,6 +522,7 @@ void Test_Or_Make_MSR_DEVICE_FILES()
         printf ("i7z DEBUG: msr device files DO NOT exist, trying out a makedev script\n");
         if (geteuid () == 0)
         {
+#ifdef __linux__
             //Try the Makedev script
             //sourced from MAKEDEV-cpuid-msr script in msr-tools
             system ("msr_major=202; \
@@ -536,6 +537,9 @@ void Test_Or_Make_MSR_DEVICE_FILES()
 							");
             printf ("i7z DEBUG: modprobbing for msr\n");
             system ("modprobe msr");
+#elif __FreeBSD__
+            system ("kldload cpuctl");
+#endif
         } else {
             printf ("i7z DEBUG: You DO NOT have root privileges, mknod to create device entries won't work out\n");
             printf ("i7z DEBUG: A solution is to run this program as root\n");

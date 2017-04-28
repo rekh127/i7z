@@ -386,7 +386,11 @@ void atexit_runsttysane()
 
 void modprobing_msr()
 {
+#ifdef __linux__
     system("modprobe msr");
+#elif __FreeBSD__
+    system("kldload cpuctl");
+#endif
 }
 
 void init_ncurses()
