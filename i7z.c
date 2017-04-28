@@ -389,7 +389,7 @@ void modprobing_msr()
 #ifdef __linux__
     system("modprobe msr");
 #elif __FreeBSD__
-    system("kldload cpuctl");
+    system("kldload -n cpuctl");
 #endif
 }
 

@@ -575,7 +575,7 @@ void Test_Or_Make_MSR_DEVICE_FILES()
             printf ("i7z DEBUG: modprobbing for msr\n");
             system ("modprobe msr");
 #elif __FreeBSD__
-            system ("kldload cpuctl");
+            system ("kldload -n cpuctl");
 #endif
         } else {
             printf ("i7z DEBUG: You DO NOT have root privileges, mknod to create device entries won't work out\n");
