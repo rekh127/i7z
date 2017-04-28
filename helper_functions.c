@@ -30,6 +30,11 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#ifdef __FreeBSD__
+#include <sys/cpuctl.h>
+#include <sys/ioctl.h>
+#include <sys/sysctl.h>
+#endif
 #include <time.h>
 #include <assert.h>
 #include <math.h>
@@ -44,6 +49,14 @@ bool E7_mp_present=false;
 #define IA32_THERM_STATUS 0x19C
 #define IA32_TEMPERATURE_TARGET 0x1a2
 #define IA32_PACKAGE_THERM_STATUS 0x1b1
+
+#ifdef __linux__
+#define	_DEV_CPU_MSR	"/dev/cpu/%d/msr"
+#define	_DEV_CPU0_MSR	"/dev/cpu/0/msr"
+#elif __FreeBSD__
+#define	_DEV_CPU_MSR	"/dev/cpuctl%d"
+#define	_DEV_CPU0_MSR	"/dev/cpuctl0"
+#endif
 
 int Get_Bits_Value(unsigned long val,int highbit, int lowbit){
 	unsigned long data = val;
@@ -246,7 +259,7 @@ uint64_t get_msr_value (int cpu, uint32_t reg, unsigned int highbit,
     int bits;
     *error_indx =0;
 
-    sprintf (msr_file_name, "/dev/cpu/%d/msr", cpu);
+    sprintf (msr_file_name, _DEV_CPU_MSR, cpu);
     fd = open (msr_file_name, O_RDONLY);
     if (fd < 0)
     {
@@ -267,11 +280,21 @@ uint64_t get_msr_value (int cpu, uint32_t reg, unsigned int highbit,
         }
     }
 
+#ifdef __linux__
     if (pread (fd, &data, sizeof data, reg) != sizeof data)
     {
         perror ("rdmsr:pread");
         exit (127);
     }
+#elif __FreeBSD__
+    cpuctl_msr_args_t args;
+    args.msr = reg;
+    if (ioctl (fd, CPUCTL_RDMSR, &args) < 0) {
+        perror ("rdmsr:ioctl");
+        exit (127);
+    }
+    data = args.data;
+#endif
 
     close (fd);
 
@@ -299,7 +322,7 @@ uint64_t set_msr_value (int cpu, uint32_t reg, uint64_t data)
     int fd;
     char msr_file_name[64];
 
-    sprintf (msr_file_name, "/dev/cpu/%d/msr", cpu);
+    sprintf (msr_file_name, _DEV_CPU_MSR, cpu);
     fd = open (msr_file_name, O_WRONLY);
     if (fd < 0)
     {
@@ -316,11 +339,21 @@ uint64_t set_msr_value (int cpu, uint32_t reg, uint64_t data)
         }
     }
 
+#if __linux__
     if (pwrite (fd, &data, sizeof data, reg) != sizeof data)
     {
         perror ("wrmsr:pwrite");
         exit (127);
     }
+#elif __FreeBSD__
+    cpuctl_msr_args_t args;
+    args.msr = reg;
+    args.data = data;
+    if (ioctl (fd, CPUCTL_WRMSR, &args) < 0) {
+        perror ("wrmsr:ioctl");
+        exit (127);
+    }
+#endif
     close(fd);
     return(1);
 }
@@ -508,10 +541,10 @@ void Print_Information_Processor(bool* nehalem, bool* sandy_bridge, bool* ivy_br
 void Test_Or_Make_MSR_DEVICE_FILES()
 {
     //test if the msr file exists
-    if (access ("/dev/cpu/0/msr", F_OK) == 0)
+    if (access (_DEV_CPU0_MSR, F_OK) == 0)
     {
-        printf ("i7z DEBUG: msr device files exist /dev/cpu/*/msr\n");
-        if (access ("/dev/cpu/0/msr", W_OK) == 0)
+        printf ("i7z DEBUG: msr device files exist %s\n", _DEV_CPU0_MSR);
+        if (access (_DEV_CPU0_MSR, W_OK) == 0)
         {
             //a system mght have been set with msr allowable to be written
             //by a normal user so...
