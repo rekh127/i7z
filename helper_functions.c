@@ -100,14 +100,18 @@ print_family_info (struct family_info *proc_info)
 static inline void cpuid (unsigned int info, unsigned int *eax, unsigned int *ebx,
                           unsigned int *ecx, unsigned int *edx)
 {
-    unsigned int _eax = info, _ebx, _ecx, _edx;
-    asm volatile ("mov %%ebx, %%edi;" // save ebx (for PIC)
-                  "cpuid;"
-                  "mov %%ebx, %%esi;" // pass to caller
-                  "mov %%edi, %%ebx;" // restore ebx
-                  :"+a" (_eax), "=S" (_ebx), "=c" (_ecx), "=d" (_edx)
-                  :      /* inputs: eax is handled above */
-                  :"edi" /* clobbers: we hit edi directly */);
+    unsigned int _eax, _ebx, _ecx, _edx;
+    asm volatile (
+#ifdef __i386__
+        "cpuid"
+        :"=a" (_eax), "=b" (_ebx), "=c" (_ecx), "=d" (_edx)
+#else
+        "xchgq %%rbx,%q1\n"
+        "cpuid\n"
+        "xchgq %%rbx,%q1"
+        :"=a" (_eax), "=r" (_ebx), "=c" (_ecx), "=d" (_edx)
+#endif
+        :"0" (info));
     if (eax) *eax = _eax;
     if (ebx) *ebx = _ebx;
     if (ecx) *ecx = _ecx;
