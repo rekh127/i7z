@@ -643,13 +643,13 @@ void print_i7z_socket(struct cpu_socket_info socket_0, int printw_offset, int PL
 
 void print_i7z ()
 {
-    struct cpu_heirarchy_info chi;
+    struct cpu_hierarchy_info chi;
     struct cpu_socket_info socket_0={.max_cpu=0, .socket_num=0, .processor_num={-1,-1,-1,-1,-1,-1,-1,-1}};
     struct cpu_socket_info socket_1={.max_cpu=0, .socket_num=1, .processor_num={-1,-1,-1,-1,-1,-1,-1,-1}};
 
-    construct_CPU_Heirarchy_info(&chi);
+    construct_CPU_Hierarchy_info(&chi);
     construct_sibling_list(&chi);
-      //print_CPU_Heirarchy(chi);
+      //print_CPU_Hierarchy(chi);
     construct_socket_information(&chi, &socket_0, &socket_1, socket_0_num, socket_1_num);
 	  //print_socket_information(&socket_0);
 	  //print_socket_information(&socket_1);
@@ -722,7 +722,7 @@ void print_i7z ()
     int k=0;
     for (;;)
     {
-        construct_CPU_Heirarchy_info(&chi);
+        construct_CPU_Hierarchy_info(&chi);
         construct_sibling_list(&chi);
         construct_socket_information(&chi, &socket_0, &socket_1, socket_0_num, socket_1_num);
 

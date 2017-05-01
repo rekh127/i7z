@@ -24,7 +24,7 @@
 #include <pthread.h>
 
 #include "perfmon-i7z.h"
-//#include "CPUHeirarchy.h"
+//#include "CPUHierarchy.h"
 
 #define CPU_FREQUENCY 3291  //this is in mhz
 
@@ -223,7 +223,7 @@ bool logging = false;
 void *main_thread(void *filename)
 {
         int i;
-	struct cpu_heirarchy_info chi;
+	struct cpu_hierarchy_info chi;
 	struct cpu_socket_info socket_0;
 	socket_0.max_cpu = 0, socket_0.socket_num = 0;
 	for(i=0; i<8; i++)
@@ -242,10 +242,10 @@ void *main_thread(void *filename)
 	FILE *fp;
 	printf("Logging enabled to %s\n", lvalue);
 
-	construct_CPU_Heirarchy_info(&chi);
+	construct_CPU_Hierarchy_info(&chi);
 	construct_sibling_list(&chi);
 	construct_socket_information(&chi, &socket_0, &socket_1);
-	//print_CPU_Heirarchy(chi);
+	//print_CPU_Hierarchy(chi);
 	//print_socket_information(&socket_0);
 
 
@@ -346,7 +346,7 @@ void *main_thread(void *filename)
 		num_online_physical_cores = 0;
 
 		for (i = 0; i < MAX_PROCESSORS_SYSTEM; i++) {
-			construct_CPU_Heirarchy_info(&chi);
+			construct_CPU_Hierarchy_info(&chi);
 			construct_sibling_list(&chi);
 			construct_socket_information(&chi, &socket_0, &socket_1);
 

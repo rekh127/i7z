@@ -40,7 +40,7 @@
 bool global_in_i7z_main_thread = false;
 int socket_list[MAX_PROCESSORS_GUI];
 int core_list[MAX_PROCESSORS_GUI];
-struct cpu_heirarchy_info chi;
+struct cpu_hierarchy_info chi;
 struct cpu_socket_info socket_0, socket_1;
 unsigned int numCPUs;
 struct program_options prog_options;
@@ -58,9 +58,9 @@ void Construct_Socket_Information_in_GUI(unsigned int *numCPUs) {
     for(i=0;i < 8; i++)
         socket_1.processor_num[i]=-1;
 
-    construct_CPU_Heirarchy_info(&chi);
+    construct_CPU_Hierarchy_info(&chi);
     construct_sibling_list(&chi);
-//    print_CPU_Heirarchy(chi);
+//    print_CPU_Hierarchy(chi);
     construct_socket_information(&chi, &socket_0, &socket_1, socket_0_num, socket_1_num);
 //    print_socket_information(&socket_0);
 //    print_socket_information(&socket_1);
@@ -132,7 +132,7 @@ void
 MyThread::run ()
 {
 
-	print_CPU_Heirarchy(chi);
+	print_CPU_Hierarchy(chi);
 
     int i, ii;
 

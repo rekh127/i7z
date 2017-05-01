@@ -9,7 +9,7 @@
 
 #define MAX_HI_PROCESSORS    MAX_PROCESSORS
 
-struct cpu_heirarchy_info {
+struct cpu_hierarchy_info {
     int max_online_cpu;
     int num_sockets;
     int sibling_num[MAX_HI_PROCESSORS];
@@ -66,7 +66,7 @@ int check_and_return_core_id(char*strinfo)
     }
 }
 
-void construct_sibling_list(struct cpu_heirarchy_info* chi)
+void construct_sibling_list(struct cpu_hierarchy_info* chi)
 {
     int i,j,core_id,socket_id;
     for (i=0;i< chi->max_online_cpu ;i++) {
@@ -99,7 +99,7 @@ void construct_sibling_list(struct cpu_heirarchy_info* chi)
     }
 }
 
-void construct_socket_information(struct cpu_heirarchy_info* chi,struct cpu_socket_info* socket_0,struct cpu_socket_info* socket_1)
+void construct_socket_information(struct cpu_hierarchy_info* chi,struct cpu_socket_info* socket_0,struct cpu_socket_info* socket_1)
 {
 
     int i;
@@ -148,7 +148,7 @@ void print_socket_information(struct cpu_socket_info* socket)
 }
 
 #ifdef __linux__
-void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
+void construct_CPU_Hierarchy_info(struct cpu_hierarchy_info* chi)
 {
     FILE *fp = fopen("/proc/cpuinfo","r");
     char strinfo[200];
@@ -195,7 +195,7 @@ void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
     fclose(fp);
 }
 #elif __FreeBSD__
-void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
+void construct_CPU_Hierarchy_info(struct cpu_hierarchy_info* chi)
 {
     int i;
     FILE *fp = fopen("/var/run/dmesg.boot", "r");
@@ -240,7 +240,7 @@ void construct_CPU_Heirarchy_info(struct cpu_heirarchy_info* chi)
 }
 #endif
 
-void print_CPU_Heirarchy(struct cpu_heirarchy_info chi)
+void print_CPU_Hierarchy(struct cpu_hierarchy_info chi)
 {
     int i;
     printf("Legend: processor number is the processor number as linux knows, socket number is the socket number,\n \
@@ -258,13 +258,13 @@ void print_CPU_Heirarchy(struct cpu_heirarchy_info chi)
 
 int main()
 {
-    struct cpu_heirarchy_info chi;
+    struct cpu_hierarchy_info chi;
     struct cpu_socket_info socket_0={.max_cpu=0, .socket_num=0, .processor_num={-1,-1,-1,-1,-1,-1,-1,-1}};
     struct cpu_socket_info socket_1={.max_cpu=0, .socket_num=1, .processor_num={-1,-1,-1,-1,-1,-1,-1,-1}};
 
-    construct_CPU_Heirarchy_info(&chi);
+    construct_CPU_Hierarchy_info(&chi);
     construct_sibling_list(&chi);
-    print_CPU_Heirarchy(chi);
+    print_CPU_Hierarchy(chi);
     construct_socket_information(&chi, &socket_0, &socket_1);
     print_socket_information(&socket_0);
     print_socket_information(&socket_1);

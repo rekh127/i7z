@@ -21,7 +21,7 @@
 #include <ncurses.h>
 #include "getopt.h"
 #include "i7z.h"
-//#include "CPUHeirarchy.h"
+//#include "CPUHierarchy.h"
 
 struct program_options prog_options;
 char* CPU_FREQUENCY_LOGGING_FILE_single="cpu_freq_log.txt";
@@ -418,7 +418,7 @@ int main (int argc, char **argv)
     char log_file_name[MAX_FILENAME_LENGTH], log_file_name2[MAX_FILENAME_LENGTH+3];
     prog_options.logging=0; //0=no logging, 1=logging, 2=appending
 
-    struct cpu_heirarchy_info chi;
+    struct cpu_hierarchy_info chi;
     struct cpu_socket_info socket_0={.max_cpu=0, .socket_num=0, .processor_num={-1,-1,-1,-1,-1,-1,-1,-1}};
     struct cpu_socket_info socket_1={.max_cpu=0, .socket_num=1, .processor_num={-1,-1,-1,-1,-1,-1,-1,-1}};
 
@@ -563,9 +563,9 @@ int main (int argc, char **argv)
     */
     ///////////////////////////////////////////////////////////
 
-    construct_CPU_Heirarchy_info(&chi);
+    construct_CPU_Hierarchy_info(&chi);
     construct_sibling_list(&chi);
-    print_CPU_Heirarchy(chi);
+    print_CPU_Hierarchy(chi);
     construct_socket_information(&chi, &socket_0, &socket_1, socket_0_num, socket_1_num);
     print_socket_information(&socket_0);
     print_socket_information(&socket_1);
