@@ -37,7 +37,6 @@ float Read_Voltage_CPU(int cpu_num);
 extern struct program_options prog_options;
 FILE *fp_log_file;
 
-struct timespec global_ts;
 extern FILE *fp_log_file_freq_1, *fp_log_file_freq_2;
 
 extern char* CPU_FREQUENCY_LOGGING_FILE_single;
@@ -583,6 +582,7 @@ void print_i7z_socket(struct cpu_socket_info socket_0, int printw_offset, int PL
 
         logOpenFile_dual(socket_0.socket_num);
         
+        struct timespec global_ts;
         clock_gettime(CLOCK_REALTIME, &global_ts);
         logCpuFreq_dual_ts(&global_ts, socket_0.socket_num);
 

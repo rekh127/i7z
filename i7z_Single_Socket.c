@@ -35,8 +35,6 @@ int Read_Thermal_Status_CPU(int cpu_num);
 extern struct program_options prog_options;
 extern FILE *fp_log_file_freq;
 
-struct timespec global_ts;
-
 extern char* CPU_FREQUENCY_LOGGING_FILE_single;
 extern char* CPU_FREQUENCY_LOGGING_FILE_dual;
 extern bool use_ncurses;
@@ -583,6 +581,7 @@ void print_i7z_socket_single(struct cpu_socket_info socket_0, int printw_offset,
 
         //time_t time_to_save;
         //logCpuFreq_single_d(time(&time_to_save));
+        struct timespec global_ts;
         clock_gettime(CLOCK_REALTIME, &global_ts);
         logCpuFreq_single_ts( &global_ts);
 
