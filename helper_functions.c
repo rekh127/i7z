@@ -821,7 +821,7 @@ void construct_CPU_Hierarchy_info(struct cpu_hierarchy_info* chi)
         }
         for (i = 0; i < ncpu; i++) {
             processor_num = i;
-            if ((coreid_num + 1) == cores)
+            if ((coreid_num + 1) == threads)
                 physicalid_num++;
             physicalid_num %= packages;
             coreid_num = processor_num % cores;
