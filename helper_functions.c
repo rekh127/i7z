@@ -798,7 +798,7 @@ void construct_CPU_Hierarchy_info(struct cpu_hierarchy_info* chi)
     char strinfo[200];
     char *tmp;
 
-    int processor_num, physicalid_num = 0, coreid_num = 0;
+    int processor_num, physicalid_num = -1, coreid_num = 0;
     int ncpu = 0, packages, cores, threads;
 
     if (fp!=NULL) {
